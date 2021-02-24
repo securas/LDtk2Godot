@@ -1,0 +1,13 @@
+[remap]
+
+importer="LDtk2Godot"
+type="PackedDataContainer"
+path="res://.import/first.ldtk-de6f25ab442025572fa7e3736d151e92.res"
+
+[deps]
+
+source_file="res://first.ldtk"
+dest_files=[ "res://.import/first.ldtk-de6f25ab442025572fa7e3736d151e92.res" ]
+
+[params]
+

@@ -1,0 +1,39 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "Node",
+"class": "LDtkEntitySpawner",
+"language": "GDScript",
+"path": "res://addons/LDtk2Godot/LDtkEntitySpawner.gd"
+}, {
+"base": "TileMap",
+"class": "LDtkTileMap",
+"language": "GDScript",
+"path": "res://addons/LDtk2Godot/LDtkTileMap.gd"
+} ]
+_global_script_class_icons={
+"LDtkEntitySpawner": "",
+"LDtkTileMap": ""
+}
+
+[application]
+
+config/name="LDtk2Godot"
+run/main_scene="res://main.tscn"
+config/icon="res://icon.png"
+
+[editor_plugins]
+
+enabled=PoolStringArray( "LDtk2Godot" )
+
+[rendering]
+
+environment/default_environment="res://default_env.tres"
