@@ -1,7 +1,7 @@
 extends Node
 class_name LDtkEntitySpawner
 
-export( PackedDataContainer ) var LDtk_Resource : PackedDataContainer = PackedDataContainer.new() setget _set_LDtk_Resource
+export( PackedDataContainer ) var LDtk_Resource : PackedDataContainer = null setget _set_LDtk_Resource
 export( Array, String ) var levels := [ "" ] setget _set_levels
 export( Array, String ) var layers := [ "" ] setget _set_layers
 
@@ -25,16 +25,32 @@ func _set_layers( v ):
 		_update_LDtk_resource()
 
 func _update_LDtk_resource():
+#	print( "Resource size: ", LDtk_Resource.size() )
+#	if LDtk_Resource.size() < 0: return
 	var data = bytes2var( LDtk_Resource.__data__, true )
+#	print( "Data size: ", data.size() )
+#	if data.size() < 0: return
 	var resource_data = bytes2var( data, true )
 	var entities_data = resource_data.entities
+	var entities_list = resource_data.entities_list
 	for level_name in levels:
 		if level_name.empty(): continue
 		for layer_name in layers:
 			if layer_name.empty(): continue
 			var entities = _get_entities( level_name, layer_name, entities_data )
+			
+			for key in entities_list.keys():
+				var entity_group = []
+				for e in entities:
+					if e.id == key:
+						entity_group.append( e )
+				if entity_group.empty():
+					continue
+				call_deferred( "_spawn_entity_group", entity_group )
+			
 			for entity in entities:
 				call_deferred( "_spawn_entity", entity )
+#				_spawn_entity( entity )
 
 func _get_entities( level_name, layer_name, entities_data ):
 	var entities = []
@@ -44,4 +60,7 @@ func _get_entities( level_name, layer_name, entities_data ):
 	return entities
 
 func _spawn_entity( entity_data : Dictionary ) -> void:
+	pass
+
+func _spawn_entity_group( entity_group : Array ) -> void:
 	pass

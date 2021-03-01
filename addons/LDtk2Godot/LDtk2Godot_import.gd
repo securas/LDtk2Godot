@@ -48,8 +48,10 @@ func import( source_file, save_path, options, r_platform_variants, r_gen_files )
 	
 	var ldtk_data = {
 		"celldata" : process_json_celldata( json ),
-		"entities" : process_json_entities( json )
+		"entities" : process_json_entities( json ),
+		"entities_list" : process_json_entities_properties( json ),
 	}
+	
 	
 	var resource := PackedDataContainer.new()
 	resource.pack( var2bytes( ldtk_data, true ) )
@@ -103,16 +105,33 @@ func process_json_entities( json : Dictionary ) -> Dictionary:
 			data[source_level.identifier][source_layer.__identifier] = []
 			var cell_size : int = source_layer.__gridSize
 #			print( "Loading layer: ", source_layer.__identifier )
+			var layer_defid = source_layer.layerDefUid
+			var idx := 0
 			for entity in source_layer.entityInstances:
+#				print( entity.__identifier, " - cell: ", \
+#					( entity.__grid[0] + entity.__pivot[0] ) * cell_size, " ",\
+#					( entity.__grid[1] + entity.__pivot[1] ) * cell_size, \
+#					"    px: ",
+#					entity.px )
 				var new_entity = {
 					"id" : entity.__identifier,
+					"position" : Vector2(
+						( entity.__grid[0] + entity.__pivot[0] ) * cell_size,
+						( entity.__grid[1] + entity.__pivot[1] ) * cell_size
+					),
 					"x" : ( entity.__grid[0] + entity.__pivot[0] ) * cell_size,
 					"y" : ( entity.__grid[1] + entity.__pivot[1] ) * cell_size,
+					"unique_id" : "%d_%d" % [ layer_defid, idx ],
 					"parameters" : {}
 				}
+				idx += 1
 				for parameter in entity.fieldInstances:
 					new_entity.parameters[parameter.__identifier] = parameter.__value
 				data[source_level.identifier][source_layer.__identifier].append( new_entity )
 	return data
 
-
+func process_json_entities_properties( json : Dictionary ) -> Dictionary:
+	var data = {}
+	for entity in json.defs.entities:
+		data[entity.identifier] = {}
+	return data

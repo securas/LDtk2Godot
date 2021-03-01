@@ -2,7 +2,7 @@ tool
 extends TileMap
 class_name LDtkTileMap
 
-export( PackedDataContainer ) var LDtk_Resource : PackedDataContainer = PackedDataContainer.new() setget _set_LDtk_Resource
+export( PackedDataContainer ) var LDtk_Resource : PackedDataContainer = null setget _set_LDtk_Resource
 export( Array, String ) var levels := [ "" ] setget _set_levels
 export( Array, String ) var layers := [ "" ] setget _set_layers
 export( int ) var tileno := 0 setget _set_tileno
@@ -33,7 +33,9 @@ func _set_tileno( v ):
 		_update_LDtk_resource()
 
 func _update_LDtk_resource():
+#	if LDtk_Resource.size() < 4: return
 	var data = bytes2var( LDtk_Resource.__data__, true )
+	if data.size() < 4: return
 	var cell_data = bytes2var( data, true )
 	_update_cell_data( cell_data )
 
