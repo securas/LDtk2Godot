@@ -115,12 +115,10 @@ func process_json_entities( json : Dictionary ) -> Dictionary:
 #					entity.px )
 				var new_entity = {
 					"id" : entity.__identifier,
-					"position" : Vector2(
-						( entity.__grid[0] + entity.__pivot[0] ) * cell_size,
-						( entity.__grid[1] + entity.__pivot[1] ) * cell_size
-					),
-					"x" : ( entity.__grid[0] + entity.__pivot[0] ) * cell_size,
-					"y" : ( entity.__grid[1] + entity.__pivot[1] ) * cell_size,
+					"position" : Vector2( entity.px[0], entity.px[1] ),
+					"grid_position" : Vector2( entity.__grid[0], entity.__grid[1] ),
+					"cell_size" : cell_size,
+					"pivot" : Vector2( entity.__pivot[0], entity.__pivot[1] ),
 					"unique_id" : "%d_%d" % [ layer_defid, idx ],
 					"parameters" : {}
 				}

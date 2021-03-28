@@ -46,7 +46,8 @@ func _update_LDtk_resource():
 						entity_group.append( e )
 				if entity_group.empty():
 					continue
-				call_deferred( "_spawn_entity_group", entity_group )
+#				call_deferred( "_spawn_entity_group", entity_group )
+				_spawn_entity_group( entity_group )
 			
 			for entity in entities:
 				call_deferred( "_spawn_entity", entity )
