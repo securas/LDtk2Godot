@@ -7,6 +7,7 @@ export( Array, String ) var levels := [ "" ] setget _set_levels
 export( Array, String ) var layers := [ "" ] setget _set_layers
 export( int ) var tileno := 0 setget _set_tileno
 
+var cell_data : Dictionary
 
 func _enter_tree():
 	if LDtk_Resource and LDtk_Resource is PackedDataContainer:
@@ -20,27 +21,33 @@ func _set_LDtk_Resource( v ):
 func _set_levels( v ):
 	levels = v
 	if LDtk_Resource and LDtk_Resource is PackedDataContainer and Engine.editor_hint:
-		_update_LDtk_resource()
+#		_update_LDtk_resource()
+		_update_cell_data( cell_data )
 
 func _set_layers( v ):
 	layers = v
 	if LDtk_Resource and LDtk_Resource is PackedDataContainer and Engine.editor_hint:
-		_update_LDtk_resource()
+#		_update_LDtk_resource()
+		_update_cell_data( cell_data )
 
 func _set_tileno( v ):
 	tileno = v
 	if LDtk_Resource and LDtk_Resource is PackedDataContainer and Engine.editor_hint:
-		_update_LDtk_resource()
+#		_update_LDtk_resource()
+		_update_cell_data( cell_data )
 
 func _update_LDtk_resource():
 #	if LDtk_Resource.size() < 4: return
 	var data = bytes2var( LDtk_Resource.__data__, true )
 	if data.size() < 4: return
-	var cell_data = bytes2var( data, true )
+#	var cell_data = bytes2var( data, true )
+	cell_data = bytes2var( data, true )
 	_update_cell_data( cell_data )
 
 func _update_cell_data( data ):
 	clear()
+	if data.single_level_resource:
+		levels = [data.single_level_name]
 	for level_name in levels:
 		if level_name.empty(): continue
 		for layer_name in layers:

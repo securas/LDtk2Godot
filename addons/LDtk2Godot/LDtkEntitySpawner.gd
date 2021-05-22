@@ -32,14 +32,24 @@ func _update_LDtk_resource():
 #	if data.size() < 0: return
 	var resource_data = bytes2var( data, true )
 	var entities_data = resource_data.entities
-	var entities_list = resource_data.entities_list
+#	var entities_list = resource_data.entities_list
+	
+	if resource_data.single_level_resource:
+		levels = [resource_data.single_level_name]
 	for level_name in levels:
 		if level_name.empty(): continue
 		for layer_name in layers:
 			if layer_name.empty(): continue
 			var entities = _get_entities( level_name, layer_name, entities_data )
 			
-			for key in entities_list.keys():
+			# create a local list of entities
+			var entities_list = []
+			for e in entities:
+				if entities_list.find( e.id ) > -1: continue
+				entities_list.append( e.id )
+			# print( "Entities List: ", entities_list)
+			
+			for key in entities_list:
 				var entity_group = []
 				for e in entities:
 					if e.id == key:
@@ -48,7 +58,7 @@ func _update_LDtk_resource():
 					continue
 #				call_deferred( "_spawn_entity_group", entity_group )
 				_spawn_entity_group( entity_group )
-			
+#
 			for entity in entities:
 				call_deferred( "_spawn_entity", entity )
 #				_spawn_entity( entity )

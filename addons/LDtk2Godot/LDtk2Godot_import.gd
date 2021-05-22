@@ -10,7 +10,7 @@ func get_visible_name():
 	return "LDTK"
 
 func get_recognized_extensions():
-	return ["ldtk"]
+	return ["ldtk","ldtkl"]
 
 func get_save_extension():
 	return "res"
@@ -45,13 +45,28 @@ func import( source_file, save_path, options, r_platform_variants, r_gen_files )
 	if parse_data.error != OK:
 		return parse_data.error
 	var json = parse_data.result
-	
-	var ldtk_data = {
-		"celldata" : process_json_celldata( json ),
+#	print(json)
+	var ldtk_data := {}
+#	if json.has( "levels" ):
+#		ldtk_data = {
+#			"celldata" : _process_json_celldata( json ),
+#			"entities" : process_json_entities( json ),
+##			"entities_list" : process_json_entities_properties( json ),
+#		}
+#	else:
+#		ldtk_data = {
+#			"celldata" : _process_json_celldata( json ),
+#			"entities" : process_json_entities( json ),
+#		}
+	ldtk_data = {
+		"single_level_resource" : not json.has( "levels" ),
+		"single_level_name" : "" if json.has( "levels" ) else json.identifier,
+		"celldata" : _process_json_celldata( json ),
 		"entities" : process_json_entities( json ),
-		"entities_list" : process_json_entities_properties( json ),
 	}
 	
+#	print( "Imported data ", ldtk_data.single_level_resource, " ", \
+#		ldtk_data.single_level_name )
 	
 	var resource := PackedDataContainer.new()
 	resource.pack( var2bytes( ldtk_data, true ) )
@@ -61,17 +76,27 @@ func import( source_file, save_path, options, r_platform_variants, r_gen_files )
 	return result
 
 
-func process_json_celldata( json : Dictionary ) -> Dictionary:
+func _process_json_celldata( json : Dictionary ) -> Dictionary:
 #	print( " <<<< Importing LDtk Data >>>>")
-	var data := {} 
-	for source_level in json.levels:
+	var data := {}
+	var json_levels = []
+	if json.has( "levels" ):
+		# a full levels LDtk file
+		json_levels = json.levels
+	else:
+		# this is a partial level file
+		json_levels = [json]
+	
+	for source_level in json_levels:
+		if source_level.has( "externalRelPath" ) and source_level.externalRelPath:
+			print( "Cells: This level is under a different file..." )
+			continue
+		
 		data[source_level.identifier] = {}
-#		print( "Loading level: ", source_level.identifier )
 		for source_layer in source_level.layerInstances:
 			if source_layer.__type == "Entities": continue
 			data[source_level.identifier][source_layer.__identifier] = []
 			var cell_size : int = source_layer.__gridSize
-#			print( "Loading layer: ", source_layer.__identifier )
 			for source_cell in source_layer.autoLayerTiles:
 				data[source_level.identifier][source_layer.__identifier].append(
 					process_cell_data( source_cell, cell_size )
@@ -80,7 +105,11 @@ func process_json_celldata( json : Dictionary ) -> Dictionary:
 				data[source_level.identifier][source_layer.__identifier].append(
 					process_cell_data( source_cell, cell_size )
 				)
+#	print( "Data: ", data )
 	return data
+
+
+
 
 func process_cell_data( source_cell : Dictionary, cell_size : int ) -> Dictionary:
 	var output := {
@@ -97,7 +126,20 @@ func process_cell_data( source_cell : Dictionary, cell_size : int ) -> Dictionar
 func process_json_entities( json : Dictionary ) -> Dictionary:
 #	print( " <<<< Importing LDtk Data Entities >>>>")
 	var data := {} 
-	for source_level in json.levels:
+	
+	var json_levels = []
+	if json.has( "levels" ):
+		# a full levels LDtk file
+		json_levels = json.levels
+	else:
+		# this is a partial level file
+		json_levels = [json]
+	
+	for source_level in json_levels:
+		if source_level.has( "externalRelPath" ) and source_level.externalRelPath:
+			print( "Entities: This level is under a different file..." )
+			continue
+		
 		data[source_level.identifier] = {}
 #		print( "Loading level: ", source_level.identifier )
 		for source_layer in source_level.layerInstances:
@@ -108,11 +150,6 @@ func process_json_entities( json : Dictionary ) -> Dictionary:
 			var layer_defid = source_layer.layerDefUid
 			var idx := 0
 			for entity in source_layer.entityInstances:
-#				print( entity.__identifier, " - cell: ", \
-#					( entity.__grid[0] + entity.__pivot[0] ) * cell_size, " ",\
-#					( entity.__grid[1] + entity.__pivot[1] ) * cell_size, \
-#					"    px: ",
-#					entity.px )
 				var new_entity = {
 					"id" : entity.__identifier,
 					"position" : Vector2( entity.px[0], entity.px[1] ),
