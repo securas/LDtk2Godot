@@ -63,6 +63,7 @@ func import( source_file, save_path, options, r_platform_variants, r_gen_files )
 		"single_level_name" : "" if json.has( "levels" ) else json.identifier,
 		"celldata" : _process_json_celldata( json ),
 		"entities" : process_json_entities( json ),
+		"world" : _process_json_leveldata( json ),
 	}
 	
 #	print( "Imported data ", ldtk_data.single_level_resource, " ", \
@@ -74,6 +75,23 @@ func import( source_file, save_path, options, r_platform_variants, r_gen_files )
 	
 	var result = ResourceSaver.save( "%s.%s" % [ save_path, get_save_extension() ], resource )
 	return result
+
+func _process_json_leveldata( json : Dictionary ) -> Dictionary:
+	var data := {}
+	var json_levels = []
+	if json.has( "levels" ):
+		# a full levels LDtk file
+		json_levels = json.levels
+	else:
+		# this is a partial level file
+		json_levels = [json]
+	for source_level in json_levels:
+		data[source_level.identifier] = {}
+		data[source_level.identifier]["level_rect"] = Rect2(
+			Vector2( source_level.worldX, source_level.worldY ),
+			Vector2( source_level.pxWid, source_level.pxWid )
+		)
+	return data
 
 
 func _process_json_celldata( json : Dictionary ) -> Dictionary:
