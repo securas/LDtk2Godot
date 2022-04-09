@@ -89,7 +89,7 @@ func _process_json_leveldata( json : Dictionary ) -> Dictionary:
 		data[source_level.identifier] = {}
 		data[source_level.identifier]["level_rect"] = Rect2(
 			Vector2( source_level.worldX, source_level.worldY ),
-			Vector2( source_level.pxWid, source_level.pxWid )
+			Vector2( source_level.pxWid, source_level.pxHei )
 		)
 	return data
 

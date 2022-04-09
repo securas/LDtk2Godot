@@ -75,7 +75,7 @@ func _update_LDtk_world() -> void:
 func _create_level_limits() -> void:
 	if _level_limits_created: return
 	_level_limits_created = true
-	print( "Creating level limits: ", _player_detection_mask )
+#	print( "Creating level limits: ", _player_detection_mask )
 	var _ret : int
 	
 	# Detection areas
